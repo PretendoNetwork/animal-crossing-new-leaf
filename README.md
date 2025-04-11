@@ -51,3 +51,4 @@ All configuration options are handled via environment variables
 | `PN_ACNL_ACCOUNT_GRPC_HOST`          | Host name for your account server gRPC service                                                  | Yes                                           |
 | `PN_ACNL_ACCOUNT_GRPC_PORT`          | Port for your account server gRPC service                                                       | Yes                                           |
 | `PN_ACNL_ACCOUNT_GRPC_API_KEY`       | API key for your account server gRPC service                                                    | No (Assumed to be an open gRPC API)           |
+| `PN_ACNL_POSTGRES_URI`               | Postgres connection string                                                                      | Yes                                           |
