@@ -49,7 +49,7 @@ func init() {
 	globals.InitAccounts()
 
 	if strings.TrimSpace(aesKey) == "" {
-		globals.Logger.Error("PN_YKW2_AES_KEY environment variable not set")
+		globals.Logger.Error("PN_ACNL_AES_KEY environment variable not set")
 		os.Exit(0)
 	} else {
 		globals.AESKey, err = hex.DecodeString(aesKey)
