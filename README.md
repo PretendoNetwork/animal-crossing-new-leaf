@@ -15,7 +15,7 @@ $ cd animal-crossing-new-leaf
 To compile using Go, `go get` the required modules and then `go build` to your desired location. You may also want to tidy the go modules, though this is optional
 
 ```bash
-$ go get -u
+$ go get
 $ go mod tidy
 $ go build -o build/animal-crossing-new-leaf
 ```
@@ -45,9 +45,14 @@ All configuration options are handled via environment variables
 | Name                                      | Description                                                                                     | Required                                      |
 |-------------------------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------|
 | `PN_ACNL_KERBEROS_PASSWORD`               | Password used as part of the internal server data in Kerberos tickets                           | No (Default password `password` will be used) |
+| `PN_ACNL_POSTGRES_URI`                    | Fully qualified URI to your Postgres server (Example `postgres://username:password@localhost/bayonetta2?sslmode=disable`)                 | Yes |
 | `PN_ACNL_AUTHENTICATION_SERVER_PORT`      | Port for the authentication server                                                              | Yes                                           |
 | `PN_ACNL_SECURE_SERVER_HOST`              | Host name for the secure server (should point to the same address as the authentication server) | Yes                                           |
 | `PN_ACNL_SECURE_SERVER_PORT`              | Port for the secure server                                                                      | Yes                                           |
 | `PN_ACNL_ACCOUNT_GRPC_HOST`               | Host name for your account server gRPC service                                                  | Yes                                           |
 | `PN_ACNL_ACCOUNT_GRPC_PORT`               | Port for your account server gRPC service                                                       | Yes                                           |
 | `PN_ACNL_ACCOUNT_GRPC_API_KEY`            | API key for your account server gRPC service                                                    | No (Assumed to be an open gRPC API)           |
+| `PN_ACNL_FRIENDS_GRPC_HOST`               | Host name for Friends gRPC service (used for friends matchmaking)                               | Yes                                           |
+| `PN_ACNL_FRIENDS_GRPC_PORT`               | Port for Friends gRPC service                                                                   | Yes                                           |
+| `PN_ACNL_FRIENDS_GRPC_API_KEY`            | API key for Friends gRPC service                                                                | No (Assumed to be an open gRPC API)           |
+| `PN_ACNL_HEALTH_CHECK_PORT`   		    | Port for the UDP health check                                                                   | No                                            |
