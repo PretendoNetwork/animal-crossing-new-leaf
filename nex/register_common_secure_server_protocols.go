@@ -1,8 +1,6 @@
 package nex
 
 import (
-	"fmt"
-
 	"github.com/PretendoNetwork/animal-crossing-new-leaf/globals"
 	"github.com/PretendoNetwork/nex-go/v2/types"
 	commonnattraversal "github.com/PretendoNetwork/nex-protocols-common-go/v2/nat-traversal"
@@ -10,67 +8,25 @@ import (
 	nattraversal "github.com/PretendoNetwork/nex-protocols-go/v2/nat-traversal"
 	secure "github.com/PretendoNetwork/nex-protocols-go/v2/secure-connection"
 
+	commondatastore "github.com/PretendoNetwork/nex-protocols-common-go/v2/datastore"
 	commonmatchmaking "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making"
 	commonmatchmakingext "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making-ext"
 	commonmatchmakeextension "github.com/PretendoNetwork/nex-protocols-common-go/v2/matchmake-extension"
 	commonutility "github.com/PretendoNetwork/nex-protocols-common-go/v2/utility"
-	commondatastore "github.com/PretendoNetwork/nex-protocols-common-go/v2/datastore"
+	datastore "github.com/PretendoNetwork/nex-protocols-go/v2/datastore"
 	matchmaking "github.com/PretendoNetwork/nex-protocols-go/v2/match-making"
 	matchmakingext "github.com/PretendoNetwork/nex-protocols-go/v2/match-making-ext"
 	matchmakeextension "github.com/PretendoNetwork/nex-protocols-go/v2/matchmake-extension"
 	utility "github.com/PretendoNetwork/nex-protocols-go/v2/utility"
-	datastore "github.com/PretendoNetwork/nex-protocols-go/v2/datastore"
 
 	"strconv"
 	"strings"
 
-	"github.com/PretendoNetwork/nex-go/v2"
-	common_globals "github.com/PretendoNetwork/nex-protocols-common-go/v2/globals"
+	local_utility "github.com/PretendoNetwork/animal-crossing-new-leaf/nex/utility"
 	matchmakingtypes "github.com/PretendoNetwork/nex-protocols-go/v2/match-making/types"
 	messagedelivery "github.com/PretendoNetwork/nex-protocols-go/v2/message-delivery"
-	notifications_types "github.com/PretendoNetwork/nex-protocols-go/v2/notifications/types"
 	ranking "github.com/PretendoNetwork/nex-protocols-go/v2/ranking"
-	local_utility "github.com/PretendoNetwork/animal-crossing-new-leaf/nex/utility"
 )
-
-func updateNotificationData(err error, packet nex.PacketInterface, callID uint32, uiType types.UInt32, uiParam1 types.UInt32, uiParam2 types.UInt32, strParam types.String) (*nex.RMCMessage, *nex.Error) {
-	if err != nil {
-		common_globals.Logger.Error(err.Error())
-		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
-	}
-	connection := packet.Sender().(*nex.PRUDPConnection)
-	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
-
-	rmcResponse := nex.NewRMCSuccess(endpoint, nil)
-	rmcResponse.ProtocolID = matchmakeextension.ProtocolID
-	rmcResponse.MethodID = matchmakeextension.MethodUpdateNotificationData
-	rmcResponse.CallID = callID
-	return rmcResponse, nil
-}
-func getFriendNotificationData(err error, packet nex.PacketInterface, callID uint32, uiType types.Int32) (*nex.RMCMessage, *nex.Error) {
-	if err != nil {
-		common_globals.Logger.Error(err.Error())
-		return nil, nex.NewError(nex.ResultCodes.Core.InvalidArgument, "change_error")
-	}
-
-	connection := packet.Sender().(*nex.PRUDPConnection)
-	endpoint := connection.Endpoint().(*nex.PRUDPEndPoint)
-
-	dataList := types.NewList[*notifications_types.NotificationEvent]()
-
-	rmcResponseStream := nex.NewByteStreamOut(endpoint.LibraryVersions(), endpoint.ByteStreamSettings())
-
-	dataList.WriteTo(rmcResponseStream)
-
-	rmcResponseBody := rmcResponseStream.Bytes()
-
-	rmcResponse := nex.NewRMCSuccess(endpoint, rmcResponseBody)
-	rmcResponse.ProtocolID = matchmakeextension.ProtocolID
-	rmcResponse.MethodID = matchmakeextension.MethodGetFriendNotificationData
-	rmcResponse.CallID = callID
-
-	return rmcResponse, nil
-}
 
 // Is this needed? -Ash
 func cleanupSearchMatchmakeSessionHandler(matchmakeSession *matchmakingtypes.MatchmakeSession) {
@@ -144,23 +100,13 @@ func registerCommonSecureServerProtocols() {
 	globals.SecureEndpoint.RegisterServiceProtocol(rankingProtocol)
 	messagedeliveryProtocol := messagedelivery.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(messagedeliveryProtocol)
-	messagedeliveryProtocol.DeliverMessage = func(err error, packet nex.PacketInterface, callID uint32, oUserMessage types.DataHolder) (*nex.RMCMessage, *nex.Error) {
-		fmt.Println(err)
-		fmt.Printf("MESSAGE DATA: %x\n", packet.RMCMessage().Parameters)
-		rmcResponse := nex.NewRMCSuccess(globals.SecureEndpoint, nil)
-		rmcResponse.ProtocolID = messagedelivery.ProtocolID
-		rmcResponse.MethodID = messagedelivery.MethodDeliverMessage
-		rmcResponse.CallID = callID
-
-		return rmcResponse, nil
-	}
 
 	utilityProtocol := utility.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(utilityProtocol)
 	commonutility.NewCommonProtocol(utilityProtocol)
 
 	utilityProtocol.GetIntegerSettings = local_utility.GetIntegerSettings
-	
+
 	matchmakeExtensionProtocol := matchmakeextension.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(matchmakeExtensionProtocol)
 	commonMatchmakeExtensionProtocol := commonmatchmakeextension.NewCommonProtocol(matchmakeExtensionProtocol)
